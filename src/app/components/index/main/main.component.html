@@ -1,0 +1,19 @@
+<nz-breadcrumb style="margin:16px 0;">
+  <!-- <nz-carousel nzVertical nzAutoPlay>
+    <div nz-carousel-content *ngFor="let index of array" id="divImg">
+      <img src="{{index}}" alt="" class="img">
+    </div>
+  </nz-carousel> -->
+</nz-breadcrumb>
+<div nz-row>
+  <div nz-col nzSpan="24" class="charts" id="map1" style="width:100%;height:500px;">
+  </div>
+</div>
+<div nz-row style="margin-top:10px;">
+  <div nz-col nzSpan="12" class="charts">
+    <div echarts [options]="chartOption" class="demo-chart"></div>
+  </div>
+  <div nz-col nzSpan="12" class="charts">
+      <div echarts [options]="option" class="demo-chart"></div>
+  </div>
+</div>

@@ -1,0 +1,61 @@
+<div  id="bg">
+<form nz-form [formGroup]="validateForm" class="login-form" (ngSubmit)="submitForm()">
+  <h2 style="color:darkblue">登录</h2>
+  <nz-form-item>
+    <nz-form-control>
+      <nz-input-group [nzPrefix]="prefixUser">
+        <input type="text" nz-input name="userName" id="userName" formControlName="userName" placeholder="用户名" [(ngModel)]="userName" required autocomplete="on" autofocus pattern="\w*" minlength="2" maxlength="10">
+      </nz-input-group>
+
+      <nz-form-explain *ngIf="validateForm.get('userName').dirty && validateForm.get('userName').errors">
+        <ng-container *ngIf="validateForm.get('userName').hasError('required')">
+          请输入用户名!
+        </ng-container>
+        <ng-container *ngIf="validateForm.get('userName').hasError('pattern')">
+          用户名格式错误！
+        </ng-container>
+        <ng-container *ngIf="validateForm.get('userName').hasError('minlength')">
+          最小长度为2！
+        </ng-container>
+        <ng-container *ngIf="validateForm.get('userName').hasError('maxlength')">
+          最大长度为10！
+        </ng-container>
+      </nz-form-explain>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-control>
+      <nz-input-group [nzPrefix]="prefixLock">
+        <input type="password" nz-input name="password" id="password" formControlName="password" placeholder="密码" [(ngModel)]="password" required autocomplete="on" pattern="\w*" minlength="5" maxlength="11">
+      </nz-input-group>
+      <nz-form-explain *ngIf="validateForm.get('password').dirty && validateForm.get('password').errors">
+        <ng-container *ngIf="validateForm.get('password').hasError('required')">
+          请输入密码!
+        </ng-container>
+        <ng-container *ngIf="validateForm.get('password').hasError('pattern')">
+          密码格式错误！
+        </ng-container>
+        <ng-container *ngIf="validateForm.get('password').hasError('minlength')">
+          最小长度为5！
+        </ng-container>
+        <ng-container *ngIf="validateForm.get('password').hasError('maxlength')">
+          最大长度为11！
+        </ng-container>
+      </nz-form-explain>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-control>
+      <label nz-checkbox formControlName="remember" [(ngModel)]="remember">
+        <span>七天内自动登录</span>
+      </label>
+      <a class="login-form-forgot" class="login-form-forgot">忘记密码</a>
+      <button type="submit" nz-button class="login-form-button" [nzType]="'primary'">登录</button>
+      Or
+      <a href="">注册!</a>
+    </nz-form-control>
+  </nz-form-item>
+</form>
+<ng-template #prefixUser><i nz-icon type="user"></i></ng-template>
+<ng-template #prefixLock><i nz-icon type="lock"></i></ng-template>
+</div>

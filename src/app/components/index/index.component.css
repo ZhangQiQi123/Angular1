@@ -1,0 +1,53 @@
+.logo {
+  width: 120px;
+  height: 31px;
+  background: rgba(255,255,255,.2);
+  margin: 16px 28px 16px 0;
+  float: left;
+}
+.userInfo{
+  float: right;
+  /* margin-right: 20px; */
+}
+.btnInfo{
+  background: #001529;
+  border:2px slategray solid;
+  color:blueviolet;
+  font-weight: bolder;
+}
+.btnInfo:hover{
+  transform: scale(1.2,1.2);
+}
+.ant-dropdown-menu-item {
+  text-align: center;
+  color:blueviolet;
+}
+.ant-dropdown-menu-item i :last-child{
+  background: blue;
+}
+.ant-dropdown-menu-item:hover{
+  transform: scale(1.1,1.1);
+}
+.a{
+  color:blueviolet;
+  font-weight: bold;
+  text-align:left;
+  font-size: 25px;
+  text-decoration: none;
+  transform:skew(10,0);
+}
+.a:hover{
+  transform: scale(2,2);
+
+}
+.ant-drawer-title{
+  font-weight: bolder;
+}
+.label{
+  font-weight: bolder;
+  color:black;
+}
+.valSpan{
+  color:blueviolet;
+  font-size: 10px;
+}

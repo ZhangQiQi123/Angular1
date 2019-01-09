@@ -1,0 +1,133 @@
+<nz-layout class="layout" *ngIf="loginUser!=null">
+    <nz-header>
+     <a class="a" routerLink="/index">管理系统</a>
+      <!-- <ul nz-menu [nzTheme]="'dark'" [nzMode]="'horizontal'" style="line-height: 64px;">
+        <li nz-menu-item>nav 1</li>
+        <li nz-menu-item>nav 2</li>
+        <li nz-menu-item>nav 3</li>
+      </ul> -->
+      <!-- <img src="../../../assets/images/login_bg.jpg" style="width:60px;height:60px;"> -->
+      <nz-dropdown  [nzPlacement]="'bottomCenter'" [nzTrigger]="'click'" class="userInfo">
+        <button nz-button nz-dropdown class="btnInfo">
+         <span>{{loginUser.userName}}</span> <i nz-icon type="down"></i>
+        </button>
+        <ul nz-menu>
+          <li nz-menu-item (click)="openMyInfo()"><i nz-icon type="idcard" theme="twotone"></i>我的信息</li>
+          <li nz-menu-item (click)="openUpPwd()"><i nz-icon type="edit" theme="twotone"></i>修改密码</li>
+          <li nz-menu-divider></li>
+          <!-- <li nz-menu-item nzDisabled><i nz-icon type="close" theme="outline"></i>disabled menu item</li>
+          <li nz-submenu>
+            <span title><i nz-icon type="close" theme="outline"></i>sub menu</span>
+            <ul>
+              <li nz-menu-item>3rd menu item</li>
+              <li nz-menu-item>4th menu item</li>
+            </ul>
+          </li> -->
+          <li nz-menu-item  (click)="createConfirm()"><i nz-icon type="logout" theme="outline" style="color:rgb(24, 144, 255);"></i>退出系统</li>
+        </ul>
+      </nz-dropdown>
+    </nz-header>
+    <nz-layout>
+      <nz-sider [nzWidth]="200" style="background:#fff">
+        <ul nz-menu [nzMode]="'inline'" style="height:100%">
+          <li nz-submenu>
+            <span title><i nz-icon type="user"></i>系统管理</span>
+            <ul>
+              <li nz-menu-item routerLink="/index/user">用户管理</li>
+              <li nz-menu-item routerLink="">角色管理</li>
+              <li nz-menu-item routerLink="">权限管理</li>
+              <!-- <li nz-menu-item>系统设置</li> -->
+            </ul>
+          </li>
+          <li nz-submenu>
+            <span title><i nz-icon type="laptop"></i>数据展示</span>
+            <ul>
+              <li nz-menu-item routerLink="/index/main2">区划聚合</li>
+              <li nz-menu-item>option6</li>
+              <li nz-menu-item>option7</li>
+              <li nz-menu-item>option8</li>
+            </ul>
+          </li>
+          <li nz-submenu>
+            <span title><i nz-icon type="notification"></i>subnav 3</span>
+            <ul>
+              <li nz-menu-item>option9</li>
+              <li nz-menu-item>option10</li>
+              <li nz-menu-item>option11</li>
+              <li nz-menu-item>option12</li>
+            </ul>
+          </li>
+        </ul>
+      </nz-sider>
+      <nz-layout style="padding:0 24px 24px;" >
+        <router-outlet></router-outlet>
+      </nz-layout>
+    </nz-layout>
+  </nz-layout>
+
+  <!-- <button nz-button nzType="primary" (click)="open()">Open</button> -->
+  <!--我的信息-->
+  <nz-drawer [nzClosable]="true" [nzVisible]="visible" [nzPlacement]="placement" [nzWidth]="500" nzTitle="我的信息" (nzOnClose)="closeMyInfo()"  *ngIf="loginUser!=null">
+    <div nz-row style="margin-top:10px;">
+      <div nz-col nzSpan="12" class="charts">
+        <label class="label">用户名：</label>
+        <span class="valSpan">{{loginUser.userName}}</span>
+      </div>
+      <div nz-col nzSpan="12" class="charts">
+        <label class="label">所属角色：</label>
+        <span class="valSpan">{{loginUser.role.roleName}}</span>
+      </div>
+    </div>
+    <div nz-row style="margin-top:10px;">
+      <div nz-col nzSpan="12" class="charts">
+        <label class="label">联系电话：</label>
+        <span class="valSpan">{{loginUser.phone}}</span>
+      </div>
+      <div nz-col nzSpan="12" class="charts">
+        <label class="label">创建日期：</label>
+        <span class="valSpan">{{loginUser.createTime}}</span>
+      </div>
+    </div>
+    <div nz-row style="margin-top:10px;">
+      <div nz-col nzSpan="12" class="charts">
+        <label class="label">修改日期：</label>
+        <span class="valSpan">{{loginUser.updateTime}}</span>
+      </div>
+    </div>
+  </nz-drawer>
+  <!--修改密码-->
+  <nz-drawer [nzClosable]="true" [nzVisible]="visibleUpPwd" [nzPlacement]="placement" [nzWidth]="500" nzTitle="修改密码" (nzOnClose)="closeUpPwd()"  *ngIf="loginUser!=null">
+    <form nz-form [formGroup]="validateUpPwdForm" (ngSubmit)="submitForm()" id="upPwdForm">    
+      <input type="hidden" id="userId" value="{{loginUser.userId}}"/>
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="password" nzRequired>密码</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24">
+          <input nz-input type="password" id="password" formControlName="password" (ngModelChange)="updateConfirmValidator()">
+          <nz-form-explain *ngIf="validateUpPwdForm.get('password').dirty && validateUpPwdForm.get('password').errors">请输入密码!</nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="checkPassword" nzRequired>确认密码</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24">
+          <input nz-input type="password" formControlName="checkPassword" id="checkPassword">
+          <nz-form-explain *ngIf="validateUpPwdForm.get('checkPassword').dirty && validateUpPwdForm.get('checkPassword').errors">
+            <ng-container *ngIf="validateUpPwdForm.get('checkPassword').hasError('required')">
+              请输入确认密码!
+            </ng-container>
+            <ng-container *ngIf="validateUpPwdForm.get('checkPassword').hasError('confirm')">
+             两次密码输入不一致!
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>     
+      <nz-form-item nz-row style="margin-bottom:8px;">
+        <nz-form-control [nzSpan]="6" [nzOffset]="6">
+            <button type="reset" (click)="closeUpPwd()" nz-button nzType="primary">取消</button>
+          <!-- <button nz-button nzType="primary">修改</button> -->
+        </nz-form-control>
+        <nz-form-control [nzSpan]="6" [nzOffset]="5">
+          <button nz-button nzType="primary">修改</button>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </nz-drawer>
