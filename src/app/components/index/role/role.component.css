@@ -1,0 +1,14 @@
+[nz-form-label] {
+    overflow: visible;
+}
+[nz-button] {
+    margin-right: 8px;
+    margin-bottom: 12px;
+}
+#btnRoleResource{
+    color:blueviolet;
+    border-top-color:blueviolet;
+    border-right-color:blueviolet;
+    border-bottom-color:blueviolet;
+    border-left-color:blueviolet;
+}

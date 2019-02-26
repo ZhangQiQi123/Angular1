@@ -1,0 +1,219 @@
+<nz-breadcrumb style="margin:16px 0;">
+    <nz-breadcrumb-item routerLink="/index/main">首页</nz-breadcrumb-item>
+    <nz-breadcrumb-item>系统管理</nz-breadcrumb-item>
+    <nz-breadcrumb-item routerLink="/index/role">角色管理</nz-breadcrumb-item>
+  </nz-breadcrumb>
+  <nz-content style="background:#fff; padding: 24px; min-height: 280px;">
+    <form nz-form  id="searchResourceForm">
+      <div nz-row [nzGutter]="24">
+        <div nz-col [nzSpan]="6">
+          <nz-form-item nzFlex>
+            <nz-form-label [nzFor]="resourceName">权限名称</nz-form-label>
+            <nz-form-control>  
+              <input nz-input placeholder="权限名称" id="resourceName" name="resourceName" [(ngModel)]="resourceName" autocomplete="on">
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="6">
+          <nz-form-item nzFlex>
+            <nz-form-label [nzFor]="resourceUrl">权限URL</nz-form-label>
+            <nz-form-control>
+                <input nz-input placeholder="权限URL" id="resourceUrl" name="resourceUrl" [(ngModel)]="resourceUrl">
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="6">
+          <nz-form-item nzFlex>
+            <nz-form-label [nzFor]="createTime">创建日期</nz-form-label>
+            <nz-form-control>
+                <nz-date-picker  [nzFormat]="dateFormat" placeholder="创建日期" [(ngModel)]="createTime" id="createTime" name="createTime"></nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="6" style="text-align: left;">
+          <button  nz-button [nzType]="'primary'" id="btnSearch" name="btnSearch" (click)="searchData();"><i nz-icon type="search" theme="outline"></i>查询</button>
+          <button nz-button [nzType]="'primary'" id="btnAdd" name="btnAdd" (click)="showResourceAddModal();"><i nz-icon type="plus" theme="outline"></i>添加</button>   
+        </div>
+      </div>
+    </form>
+    <nz-table
+    #ajaxTable
+    nzShowSizeChanger
+    [nzFrontPagination]="false"
+    [nzBordered]="true"
+    [nzData]="dataSet"
+    [nzShowQuickJumper]="true"
+    [nzShowSizeChanger]="true"
+    [nzLoading]="loading"
+    [nzTotal]="total"
+    [(nzPageIndex)]="pageIndex"
+    [(nzPageSize)]="pageSize"
+    (nzPageIndexChange)="searchData()"
+    (nzPageSizeChange)="searchData(true)">
+    <thead>
+      <tr>
+        <th>No.</th>
+        <th>权限名称</th>
+        <th>菜单类型</th>
+        <!-- <th>父节点</th> -->
+        <th>权限URL</th>
+        <!-- <th>图标</th> -->
+        <th>创建时间</th>
+        <th>修改时间</th>
+        <th>备注</th>
+        <th><span>操作</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of ajaxTable.data;let i=index">
+        <td>{{i+1}}</td>
+        <td>{{data.resourceName}}</td>
+        <td *ngIf="data.resourceTypeId==1">一级菜单</td>
+        <td *ngIf="data.resourceTypeId==2">二级菜单</td>
+        <td>{{data.resourceUrl}}</td>
+        <!-- <td [innerHTML]="data.icons|innerHTMLPipe"></td> -->
+        <td>{{data.createTime}}</td>
+        <td>{{data.updateTime}}</td>
+        <td>{{data.remark}}</td>
+        <td> 
+          <button nz-button nzType="primary" (click)="showResourceModal(data.resourceId)"><i nz-icon type="edit"></i>修改</button>
+          <button nz-button nzType="danger" nz-popconfirm nzTitle="确定要删除此权限吗?" (nzOnConfirm)="deleteConfirm(data.resourceId,data.resourceName)" (nzOnCancel)="deleteCancel()"><i nz-icon type="minus" theme="outline"></i>删除</button>
+          <!-- <button nz-button nzType="dashed" id="btnRoleResource" name="btnShowResource" (click)="showRoleResourceModal(data.roleId);"><i nz-icon type="key" theme="outline"></i>授权</button> -->
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+  </nz-content>
+<!-- 添加角色 -->
+<nz-modal [(nzVisible)]="isResourceAddVisible" nzTitle="权限录入" (nzOnCancel)="handleCancel($event)" (nzOnOk)="handleOk()" nzWidth="800" [nzOkLoading]="isResourceAddOkLoading">
+  <form nz-form [formGroup]="validateAddResourceForm" id="addRoleForm">
+    <div nz-row [nzGutter]="24">
+      <div nz-col nzSpan="12">
+        <nz-form-item nzFlex>
+          <nz-form-label [nzFor]="addResourceName">权限名称</nz-form-label>
+          <!--验证的响应图标-->
+          <nz-form-control nzHasFeedback>  
+            <nz-input-group>
+              <input nz-input  id="addResourceName" name="addResourceName" formControlName="addResourceName" [(ngModel)]="addResourceName"  placeholder="权限名称" required autocomplete="on" autofocus pattern="[\w\u4E00-\u9FA5\uF900-\uFA2D]*" minlength="2" maxlength="10">
+            </nz-input-group>
+
+            <nz-form-explain *ngIf="validateAddResourceForm.get('addResourceName').dirty && validateAddResourceForm.get('addResourceName').errors">
+              <ng-container *ngIf="validateAddResourceForm.get('addResourceName').hasError('required')">
+                请输入权限名称!
+              </ng-container>
+              <ng-container *ngIf="validateAddResourceForm.get('addResourceName').hasError('checkResourceName')">
+                权限名称已经存在!
+              </ng-container>
+              <ng-container *ngIf="validateAddResourceForm.get('addResourceName').hasError('pattern')">
+                权限名称格式错误！
+              </ng-container>
+              <ng-container *ngIf="validateAddResourceForm.get('addResourceName').hasError('minlength')">
+                最小长度为2！
+              </ng-container>
+              <ng-container *ngIf="validateAddResourceForm.get('addResourceName').hasError('maxlength')">
+                最大长度为10！
+              </ng-container>
+              <ng-container *ngIf="validateAddResourceForm.get('addResourceName').pending">
+                Validating...
+              </ng-container>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col nzSpan="12">
+        <nz-form-item nzFlex>
+          <nz-form-label [nzFor]="addResourceName">菜单类型</nz-form-label>
+          <!--验证的响应图标-->
+          <nz-form-control nzHasFeedback>  
+            <nz-input-group>
+              <nz-select id="addResourceTypeId" name="addResourceTypeId" formControlName="addResourceTypeId" nzPlaceHolder="菜单类型" [(ngModel)]="addResourceTypeId" style="max-width: 174px; width:174px;" (ngModelChange)="resourceTypeChange($event)">
+                <nz-option nzValue="{{resourceType.resourceTypeId}}" nzLabel="{{resourceType.resourceTypeName}}"  *ngFor="let resourceType of resourceTypes" ></nz-option>
+              </nz-select>
+            </nz-input-group>
+            <nz-form-explain *ngIf="validateAddResourceForm.get('addResourceTypeId').dirty && validateAddResourceForm.get('addResourceTypeId').errors">
+              <ng-container *ngIf="validateAddResourceForm.get('addResourceTypeId').hasError('required')">
+                请选择权限类型!
+              </ng-container>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+    <div nz-row [nzGutter]="24">
+      <div nz-col nzSpan="12">
+        <nz-form-item nzFlex>
+          <nz-form-label [nzFor]="addResourceUrl">权限URL</nz-form-label>
+          <!--验证的响应图标-->
+          <nz-form-control nzHasFeedback>  
+            <nz-input-group>
+              <input nz-input  id="addResourceUrl" name="addResourceUrl" formControlName="addResourceUrl" [(ngModel)]="addResourceUrl"  placeholder="权限URL" required autocomplete="on" autofocus pattern="[\w\u4E00-\u9FA5\uF900-\uFA2D]*" minlength="2" maxlength="10">
+            </nz-input-group>
+            <nz-form-explain *ngIf="validateAddResourceForm.get('addResourceUrl').dirty && validateAddResourceForm.get('addResourceUrl').errors">
+              <ng-container *ngIf="validateAddResourceForm.get('addResourceUrl').hasError('required')">
+                请输入权限URL!
+              </ng-container>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      
+      <div nz-col nzSpan="12" style="display:none" id="parameterNode">
+        <nz-form-item nzFlex>
+          <nz-form-label [nzFor]="addResourceName">父&nbsp;节&nbsp;点</nz-form-label>
+          <!--验证的响应图标-->
+          <nz-form-control nzHasFeedback>  
+            <nz-input-group>
+              <nz-select id="addResourceParmaterId" name="addResourceParmaterId" formControlName="addResourceParmaterId" nzPlaceHolder="父节点" [(ngModel)]="addResourceParmaterId" style="max-width: 174px; width:174px;" >
+                <nz-option nzValue="{{paramaterId.resourceId}}" nzLabel="{{paramaterId.resourceName}}"  *ngFor="let paramaterId of paramaterIds" ></nz-option>
+              </nz-select>
+            </nz-input-group>
+            <nz-form-explain *ngIf="validateAddResourceForm.get('addResourceParmaterId').dirty && validateAddResourceForm.get('addResourceParmaterId').errors">
+              <ng-container *ngIf="validateAddResourceForm.get('addResourceParmaterId').hasError('required')">
+                请选择父节点!
+              </ng-container>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+    <div nz-row [nzGutter]="24">
+      <div nz-col nzSpan="12">
+        <nz-form-item nzFlex>
+          <nz-form-label [nzFor]="addResourceName">备&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注</nz-form-label>
+          <!--验证的响应图标-->
+          <nz-form-control nzHasFeedback>  
+            <nz-input-group>
+              <input nz-input  id="addRemark" name="addRemark" formControlName="addRemark" placeholder="备注" [(ngModel)]="addRemark" required autocomplete="on" pattern="[\w\u4E00-\u9FA5\uF900-\uFA2D]*" minlength="2" maxlength="20">
+            </nz-input-group>
+            <nz-form-explain *ngIf="validateAddResourceForm.get('addRemark').dirty && validateAddResourceForm.get('addRemark').errors">
+              <ng-container *ngIf="validateAddResourceForm.get('addRemark').hasError('required')">
+                请输入备注!
+              </ng-container>
+              <ng-container *ngIf="validateAddResourceForm.get('addRemark').hasError('pattern')">
+                备注格式错误！
+              </ng-container>
+              <ng-container *ngIf="validateAddResourceForm.get('addRemark').hasError('minlength')">
+                最小长度为2！
+              </ng-container>
+              <ng-container *ngIf="validateAddResourceForm.get('addRemark').hasError('maxlength')">
+                最大长度为20！
+              </ng-container>
+              <ng-container *ngIf="validateAddResourceForm.get('addRemark').pending">
+                Validating...
+              </ng-container>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+  </form>
+</nz-modal>
+
+
+
+<!-- <nz-select style="width: 120px;" [(ngModel)]="selectedProvince" (ngModelChange)="provinceChange($event)">
+    <nz-option *ngFor="let p of provinceData" [nzValue]="p" [nzLabel]="p"></nz-option>
+  </nz-select>
+  <nz-select style="width: 120px;" [(ngModel)]="selectedCity">
+    <nz-option *ngFor="let c of cityData[selectedProvince]" [nzValue]="c" [nzLabel]="c"></nz-option>
+  </nz-select> -->

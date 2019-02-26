@@ -8,9 +8,9 @@
     <div nz-row [nzGutter]="24">
       <div nz-col [nzSpan]="6">
         <nz-form-item nzFlex>
-          <nz-form-label [nzFor]="userName">用户名</nz-form-label>
+          <nz-form-label [nzFor]="userName">用户名称</nz-form-label>
           <nz-form-control>  
-            <input nz-input placeholder="用户名" id="userName" name="userName" [(ngModel)]="userName">
+            <input nz-input placeholder="用户名称" id="userName" name="userName" [(ngModel)]="userName">
           </nz-form-control>
         </nz-form-item>
       </div>
@@ -33,7 +33,8 @@
         </nz-form-item>
       </div>
       <div nz-col [nzSpan]="6" style="text-align: left;">
-        <button nz-button [nzType]="'primary'" id="btnSearch" name="btnSearch" (click)="searchData();">查询</button>   
+        <button  nz-button [nzType]="'primary'" id="btnSearch" name="btnSearch" (click)="searchData();"><i nz-icon type="search" theme="outline"></i>查询</button>
+        <button nz-button [nzType]="'primary'" id="btnAdd" name="btnAdd" (click)="showUserAddModal();"><i nz-icon type="user-add" theme="outline"></i>添加</button>   
       </div>
     </div>
   </form>
@@ -41,6 +42,7 @@
     #ajaxTable
     nzShowSizeChanger
     [nzFrontPagination]="false"
+    [nzBordered]="true"
     [nzData]="dataSet"
     [nzLoading]="loading"
     [nzTotal]="total"
@@ -68,8 +70,8 @@
         <td>{{data.createTime}}</td>
         <td>{{data.updateTime}}</td>
         <td> 
-          <button nz-button nzType="primary" (click)="showUserInfoModal(data.userId)">修改</button>
-          <button nz-button nzType="danger">删除</button>
+          <button nz-button nzType="primary" (click)="showUserInfoModal(data.userId)"><i nz-icon type="edit"></i>修改</button>
+          <button nz-button nzType="danger" nz-popconfirm nzTitle="确定要删除此用户吗?" (nzOnConfirm)="deleteConfirm(data.userId,data.userName)" (nzOnCancel)="deleteCancel()"><i nz-icon type="user-delete" theme="outline"></i>删除</button>
         </td>
       </tr>
     </tbody>
@@ -77,12 +79,12 @@
 </nz-content>
 
 <!--用户信息详情|修改-->
-<nz-modal [(nzVisible)]="userInfoIsVisible" nzTitle="用户信息详情" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk(indexUserInfo.userId)" nzWidth="700" [nzOkLoading]="isUpUserLoading">
+<nz-modal [(nzVisible)]="userInfoIsVisible" nzTitle="用户信息详情" (nzOnCancel)="upUserCancel()" (nzOnOk)="upUserOk(indexUserInfo.userId)" nzWidth="700" [nzOkLoading]="isUpUserLoading">
     <form nz-form  id="upUserForm">
       <div nz-row [nzGutter]="24">
         <div nz-col nzSpan="12">
           <nz-form-item nzFlex>
-            <nz-form-label [nzFor]="userName">用&nbsp;&nbsp;户&nbsp;&nbsp;名</nz-form-label>
+            <nz-form-label [nzFor]="userName">用户名称</nz-form-label>
             <nz-form-control>  
               <input nz-input  id="upUserName" name="upUserName" [(ngModel)]="indexUserInfo.userName">
             </nz-form-control>
@@ -128,3 +130,154 @@
         </div>
       </div>
     </form>
+</nz-modal>
+<!--用户添加-->
+<nz-modal [(nzVisible)]="userAddIsVisible" nzTitle="用户信息录入" (nzOnCancel)="addUserCancel($event)" (nzOnOk)="addUserOk()" nzWidth="700" [nzOkLoading]="isAddUserLoading" nzGetContainer="form">
+    <form nz-form [formGroup]="validateAddUserForm" id="addUserForm">
+      <div nz-row [nzGutter]="24">
+        <div nz-col nzSpan="12">
+          <nz-form-item nzFlex>
+            <nz-form-label [nzFor]="adduserName">用户名称</nz-form-label>
+            <!--验证的响应图标-->
+            <nz-form-control nzHasFeedback>  
+              <nz-input-group>
+                <input nz-input  id="addUserName" name="addUserName" formControlName="addUserName" [(ngModel)]="addUserName" placeholder="用户名称" required autocomplete="on" autofocus pattern="[\w\u4E00-\u9FA5\uF900-\uFA2D]*" minlength="2" maxlength="10">
+              </nz-input-group>
+              <nz-form-explain *ngIf="validateAddUserForm.get('addUserName').dirty && validateAddUserForm.get('addUserName').errors">
+                <ng-container *ngIf="validateAddUserForm.get('addUserName').hasError('required')">
+                  请输入用户名!
+                </ng-container>
+                <ng-container *ngIf="validateAddUserForm.get('addUserName').hasError('checkUserName')">
+                  用户名已经存在!
+                </ng-container>
+                <ng-container *ngIf="validateAddUserForm.get('addUserName').hasError('pattern')">
+                  用户名格式错误！
+                </ng-container>
+                <ng-container *ngIf="validateAddUserForm.get('addUserName').hasError('minlength')">
+                  最小长度为2！
+                </ng-container>
+                <ng-container *ngIf="validateAddUserForm.get('addUserName').hasError('maxlength')">
+                  最大长度为10！
+                </ng-container>
+                <ng-container *ngIf="validateAddUserForm.get('addUserName').pending">
+                  Validating...
+                </ng-container>
+              </nz-form-explain>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzSpan="12">
+          <nz-form-item nzFlex>
+              <nz-form-label [nzFor]="addRoleId">所属角色</nz-form-label>
+              <nz-form-control nzHasFeedback>
+                <nz-input-group>
+                  <nz-select id="addRoleId" name="addRoleId" formControlName="addRoleId" style="max-width:198px; width:198px;" [(ngModel)]="addRoleId" placeholder="请选择">
+                    <nz-option nzValue="{{role.roleId}}" nzLabel="{{role.roleName}}"  *ngFor="let role of roles"></nz-option>
+                  </nz-select>
+                </nz-input-group>
+                <nz-form-explain *ngIf="validateAddUserForm.get('addRoleId').dirty && validateAddUserForm.get('addRoleId').errors">
+                  <ng-container *ngIf="validateAddUserForm.get('addRoleId').hasError('required')">
+                    请选择角色!
+                  </ng-container>
+                </nz-form-explain>
+              </nz-form-control>
+          </nz-form-item>  
+        </div>
+      </div>
+      <div nz-row [nzGutter]="24">
+        <div nz-col nzSpan="12">
+            <nz-form-item nzFlex>
+              <nz-form-label [nzFor]="addPwd">用户密码</nz-form-label>
+              <nz-form-control  nzHasFeedback> 
+                <nz-input-group>
+                  <input type="password" nz-input id="addPwd" name="addPwd" formControlName="addPwd" [(ngModel)]="addPassword" required placeholder="用户密码" pattern="\w*" minlength="5" maxlength="11">
+                </nz-input-group>
+                <nz-form-explain *ngIf="validateAddUserForm.get('addPwd').dirty && validateAddUserForm.get('addPwd').errors">
+                  <ng-container *ngIf="validateAddUserForm.get('addPwd').hasError('required')">
+                    请输入用户密码!
+                  </ng-container>
+                  <ng-container *ngIf="validateAddUserForm.get('addPwd').hasError('pattern')">
+                    密码格式错误！
+                  </ng-container>
+                  <ng-container *ngIf="validateAddUserForm.get('addPwd').hasError('minlength')">
+                    最小长度为5！
+                  </ng-container>
+                  <ng-container *ngIf="validateAddUserForm.get('addPwd').hasError('maxlength')">
+                    最大长度为11！
+                  </ng-container>
+                </nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>         
+        </div>
+        <div nz-col nzSpan="12">
+          <nz-form-item nzFlex>
+            <nz-form-label [nzFor]="price">价&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;格</nz-form-label>
+            <nz-form-control  nzHasFeedback> 
+              <nz-input-group>
+                <input nz-input id="addPrice" name="addPrice" formControlName="addPrice" [(ngModel)]="addPrice" placeholder="价格" pattern="[0-9]+([.]{1}[0-9]+){0,1}" maxlength="10">
+              </nz-input-group>
+                <nz-form-explain *ngIf="validateAddUserForm.get('addPrice').dirty && validateAddUserForm.get('addPrice').errors">
+                  <ng-container *ngIf="validateAddUserForm.get('addPrice').hasError('required')">
+                    请输入价格!
+                  </ng-container>
+                </nz-form-explain>
+            </nz-form-control>
+          </nz-form-item>
+        </div>        
+      </div>
+
+      <div nz-row [nzGutter]="24">
+        <div nz-col nzSpan="12">
+          <nz-form-item nzFlex>
+            <nz-form-label [nzFor]="price">确认密码</nz-form-label>
+            <nz-form-control  nzHasFeedback> 
+              <nz-input-group>
+                <input type="password" nz-input id="addRePwd" name="addRePwd" formControlName="addRePwd" [(ngModel)]="addRePassword" placeholder="确认密码" pattern="\w*" minlength="5" maxlength="11">
+              </nz-input-group>
+                <nz-form-explain *ngIf="validateAddUserForm.get('addRePwd').dirty && validateAddUserForm.get('addRePwd').errors">
+                  <ng-container *ngIf="validateAddUserForm.get('addRePwd').hasError('required')">
+                    请输入确认密码!
+                  </ng-container>
+                  <ng-container *ngIf="validateAddUserForm.get('addRePwd').hasError('checkRePwd')">
+                    两次密码输入不一致！请重新输入
+                  </ng-container>
+                  <ng-container *ngIf="validateAddUserForm.get('addPwd').hasError('pattern')">
+                    密码格式错误！
+                  </ng-container>
+                  <ng-container *ngIf="validateAddUserForm.get('addPwd').hasError('minlength')">
+                    最小长度为5！
+                  </ng-container>
+                  <ng-container *ngIf="validateAddUserForm.get('addPwd').hasError('maxlength')">
+                    最大长度为11！
+                  </ng-container>
+                </nz-form-explain>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzSpan="12">
+          <nz-form-item nzFlex>
+            <nz-form-label [nzFor]="addPhone">联系电话</nz-form-label>
+            <nz-form-control nzHasFeedback> 
+              <nz-input-group>
+                <input nz-input id="addPhone" name="addPhone" formControlName="addPhone" [(ngModel)]="addPhone" placeholder="联系电话" pattern="1(3|4|5|7|8)\d{9}" minlength="7" maxlength="11">
+              </nz-input-group>
+              <nz-form-explain *ngIf="validateAddUserForm.get('addPhone').dirty && validateAddUserForm.get('addPhone').errors">
+                <ng-container *ngIf="validateAddUserForm.get('addPhone').hasError('required')">
+                  请输入联系电话!
+                </ng-container>
+                <ng-container *ngIf="validateAddUserForm.get('addPhone').hasError('pattern')">
+                  联系电话格式错误！
+                </ng-container>
+                <ng-container *ngIf="validateAddUserForm.get('addPhone').hasError('minlength')">
+                  最小长度为7！
+                </ng-container>
+                <ng-container *ngIf="validateAddUserForm.get('addPhone').hasError('maxlength')">
+                  最大长度为11！
+                </ng-container>
+              </nz-form-explain>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+    </form>
+</nz-modal>

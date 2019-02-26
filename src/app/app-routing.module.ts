@@ -5,6 +5,8 @@ import { IndexComponent } from './components/index/index.component';
 import { UserComponent } from './components/index/user/user.component';
 import { MainComponent } from './components/index/main/main.component';
 import { Main2Component } from './components/index/main2/main2.component';
+import { RoleComponent } from './components/index/role/role.component';
+import { ResourceComponent } from './components/index/resource/resource.component';
 
 
 const routes: Routes = [
@@ -27,6 +29,14 @@ const routes: Routes = [
       {
         path:'user',
         component:UserComponent
+      },
+      {
+        path:'role',
+        component:RoleComponent
+      },
+      {
+        path:'resource',
+        component:ResourceComponent
       }
     ]
   },

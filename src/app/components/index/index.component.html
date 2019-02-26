@@ -15,14 +15,6 @@
           <li nz-menu-item (click)="openMyInfo()"><i nz-icon type="idcard" theme="twotone"></i>我的信息</li>
           <li nz-menu-item (click)="openUpPwd()"><i nz-icon type="edit" theme="twotone"></i>修改密码</li>
           <li nz-menu-divider></li>
-          <!-- <li nz-menu-item nzDisabled><i nz-icon type="close" theme="outline"></i>disabled menu item</li>
-          <li nz-submenu>
-            <span title><i nz-icon type="close" theme="outline"></i>sub menu</span>
-            <ul>
-              <li nz-menu-item>3rd menu item</li>
-              <li nz-menu-item>4th menu item</li>
-            </ul>
-          </li> -->
           <li nz-menu-item  (click)="createConfirm()"><i nz-icon type="logout" theme="outline" style="color:rgb(24, 144, 255);"></i>退出系统</li>
         </ul>
       </nz-dropdown>
@@ -31,11 +23,11 @@
       <nz-sider [nzWidth]="200" style="background:#fff">
         <ul nz-menu [nzMode]="'inline'" style="height:100%">
           <li nz-submenu>
-            <span title><i nz-icon type="user"></i>系统管理</span>
+            <span title><i nz-icon type="setting"></i>系统管理</span>
             <ul>
               <li nz-menu-item routerLink="/index/user">用户管理</li>
-              <li nz-menu-item routerLink="">角色管理</li>
-              <li nz-menu-item routerLink="">权限管理</li>
+              <li nz-menu-item routerLink="/index/role">角色管理</li>
+              <li nz-menu-item routerLink="/index/resource"><i nz-icon type="share-alt" theme="outline" id="resourceIcon"></i>权限管理</li>
               <!-- <li nz-menu-item>系统设置</li> -->
             </ul>
           </li>
@@ -61,6 +53,8 @@
       </nz-sider>
       <nz-layout style="padding:0 24px 24px;" >
         <router-outlet></router-outlet>
+        <!--返回顶部-->
+        <nz-back-top></nz-back-top>
       </nz-layout>
     </nz-layout>
   </nz-layout>
@@ -100,22 +94,48 @@
     <form nz-form [formGroup]="validateUpPwdForm" (ngSubmit)="submitForm()" id="upPwdForm">    
       <input type="hidden" id="userId" value="{{loginUser.userId}}"/>
       <nz-form-item>
-        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="password" nzRequired>密码</nz-form-label>
-        <nz-form-control [nzSm]="14" [nzXs]="24">
-          <input nz-input type="password" id="password" formControlName="password" (ngModelChange)="updateConfirmValidator()">
-          <nz-form-explain *ngIf="validateUpPwdForm.get('password').dirty && validateUpPwdForm.get('password').errors">请输入密码!</nz-form-explain>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="password" nzRequired>用户密码</nz-form-label>
+        <nz-form-control nzHasFeedback [nzSm]="14" [nzXs]="24">
+          <nz-input-group>
+            <input nz-input type="password" id="password" formControlName="password" (ngModelChange)="updateConfirmValidator()" required placeholder="用户密码" pattern="\w*" minlength="5" maxlength="11">
+          </nz-input-group>
+          <nz-form-explain *ngIf="validateUpPwdForm.get('password').dirty && validateUpPwdForm.get('password').errors">
+            <ng-container *ngIf="validateUpPwdForm.get('password').hasError('required')">
+              请输入用户密码!
+            </ng-container>
+            <ng-container *ngIf="validateUpPwdForm.get('password').hasError('pattern')">
+              密码格式错误！
+            </ng-container>
+            <ng-container *ngIf="validateUpPwdForm.get('password').hasError('minlength')">
+              最小长度为5！
+            </ng-container>
+            <ng-container *ngIf="validateUpPwdForm.get('password').hasError('maxlength')">
+              最大长度为11！
+            </ng-container>
+          </nz-form-explain>
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>
         <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="checkPassword" nzRequired>确认密码</nz-form-label>
-        <nz-form-control [nzSm]="14" [nzXs]="24">
-          <input nz-input type="password" formControlName="checkPassword" id="checkPassword">
+        <nz-form-control nzHasFeedback [nzSm]="14" [nzXs]="24">
+          <nz-input-group>
+            <input nz-input type="password" formControlName="checkPassword" id="checkPassword" required placeholder="用户密码" pattern="\w*" minlength="5" maxlength="11">
+          </nz-input-group>
           <nz-form-explain *ngIf="validateUpPwdForm.get('checkPassword').dirty && validateUpPwdForm.get('checkPassword').errors">
             <ng-container *ngIf="validateUpPwdForm.get('checkPassword').hasError('required')">
               请输入确认密码!
             </ng-container>
             <ng-container *ngIf="validateUpPwdForm.get('checkPassword').hasError('confirm')">
              两次密码输入不一致!
+            </ng-container>
+            <ng-container *ngIf="validateUpPwdForm.get('checkPassword').hasError('pattern')">
+              密码格式错误！
+            </ng-container>
+            <ng-container *ngIf="validateUpPwdForm.get('checkPassword').hasError('minlength')">
+              最小长度为5！
+            </ng-container>
+            <ng-container *ngIf="validateUpPwdForm.get('checkPassword').hasError('maxlength')">
+              最大长度为11！
             </ng-container>
           </nz-form-explain>
         </nz-form-control>
@@ -126,7 +146,7 @@
           <!-- <button nz-button nzType="primary">修改</button> -->
         </nz-form-control>
         <nz-form-control [nzSpan]="6" [nzOffset]="5">
-          <button nz-button nzType="primary">修改</button>
+          <button nz-button nzType="primary" [nzLoading]="isUpUserPwdLoading">修改</button>
         </nz-form-control>
       </nz-form-item>
     </form>

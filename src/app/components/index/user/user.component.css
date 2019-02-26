@@ -2,10 +2,13 @@
   [nz-form-label] {
     overflow: visible;
   }
-
-  button {
-    margin-left: 8px;
+  [nz-button] {
+    margin-right: 8px;
+    margin-bottom: 12px;
   }
+  /* button {
+    margin-left: 8px;
+  } */
   .valSpan{
     color:blueviolet;
     font-size: 10px;

@@ -18,3 +18,21 @@ body{
 label{
     font-weight: bolder;
 }
+
+
+/*table tr th*/
+.ant-table-thead>tr>th{
+    text-align: center;
+    background-color: rgba(0,0,0,.15);
+}
+/*table tr td*/
+.ant-table-tbody>tr>td{
+    text-align: center;
+}
+/*icon位置*/
+.anticon {
+    vertical-align: 0;
+}
+svg{
+    margin: -2px -3px 0 0;
+}

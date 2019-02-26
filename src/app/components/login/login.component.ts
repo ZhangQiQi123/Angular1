@@ -27,6 +27,7 @@ export class LoginComponent implements OnInit {
    remember:true;
    nowURL:any;
    
+   
   submitForm(): void {
     for (const i in this.validateForm.controls) {
       this.validateForm.controls[ i ].markAsDirty();
@@ -135,4 +136,5 @@ export class LoginComponent implements OnInit {
       }
     });
   }
+
 }

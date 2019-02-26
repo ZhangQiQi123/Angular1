@@ -24,7 +24,7 @@ import {
 })
 
 export class IndexComponent implements OnInit {
-
+  isUpUserPwdLoading=false;
   nowURL:any;
   loginUser:any;
   cookieUser:any;
@@ -58,8 +58,8 @@ export class IndexComponent implements OnInit {
 
     //修改密码验证
     this.validateUpPwdForm = this.fb.group({
-      password         : [ null, [ Validators.required ] ],
-      checkPassword    : [ null, [ Validators.required, this.confirmationValidator ] ]
+      password         : [ null, [ Validators.required, Validators.pattern] ],
+      checkPassword    : [ null, [ Validators.required,  Validators.pattern,this.confirmRePwd ] ]
     });
   }
   //检查是否有用户的cookie信息
@@ -114,27 +114,37 @@ export class IndexComponent implements OnInit {
     });
   }
 
-
+  //修改密码
   submitForm(): void {
+    
     for (const i in this.validateUpPwdForm.controls) {
       this.validateUpPwdForm.controls[ i ].markAsDirty();
       this.validateUpPwdForm.controls[ i ].updateValueAndValidity();
     }
     var userId=$("#userId").val();
     var password=$("#password").val();
+    var repassword=$("#checkPassword").val();
     var url="/updateUserPwdById";
     var param:any={
       userId:userId,
       password:password
     };
-    this.utilService.doGet(url,param).then((data:any)=>{
-      if (data.msg=="success") {
-        this.utilService.createAlert("success","密码修改成功！");
-        this.closeUpPwd();
-      }else{
-        this.utilService.createAlert("error","密码修改失败，请刷新重试！");
-      }
-    });
+    
+    if (password==repassword && password != "" && repassword != "") {
+      this.isUpUserPwdLoading=true;
+      this.utilService.doGet(url,param).then((data:any)=>{
+        if (data.msg=="success") {
+        setTimeout(_ => {
+          this.isUpUserPwdLoading = false;
+        }, 1500);
+          this.utilService.createAlert("success","密码修改成功！");
+          this.closeUpPwd();
+        }else{
+          this.utilService.createAlert("error","密码修改失败，请刷新重试！");
+        }
+      });
+    }
+    
   }
 
   updateConfirmValidator(): void {
@@ -142,7 +152,7 @@ export class IndexComponent implements OnInit {
     Promise.resolve().then(() => this.validateUpPwdForm.controls.checkPassword.updateValueAndValidity());
   }
 
-  confirmationValidator = (control: FormControl): { [ s: string ]: boolean } => {
+  confirmRePwd = (control: FormControl): { [ s: string ]: boolean } => {
     if (!control.value) {
       return { required: true };
     } else if (control.value !== this.validateUpPwdForm.controls.password.value) {

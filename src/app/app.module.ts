@@ -16,6 +16,9 @@ import { MainComponent } from './components/index/main/main.component';
 import {NgxEchartsModule} from 'ngx-echarts';
 import {scaleLinear} from "d3-scale";
 import { Main2Component } from './components/index/main2/main2.component';
+import { RoleComponent } from './components/index/role/role.component';
+import { ResourceComponent } from './components/index/resource/resource.component';
+import { InnerHTMLPipePipe } from './pipe/inner-htmlpipe.pipe';
 registerLocaleData(zh);
 
 @NgModule({
@@ -25,7 +28,10 @@ registerLocaleData(zh);
     IndexComponent,
     UserComponent,
     MainComponent,
-    Main2Component
+    Main2Component,
+    RoleComponent,
+    ResourceComponent,
+    InnerHTMLPipePipe
   ],
   imports: [
     BrowserModule,

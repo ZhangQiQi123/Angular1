@@ -1,0 +1,153 @@
+<nz-breadcrumb style="margin:16px 0;">
+  <nz-breadcrumb-item routerLink="/index/main">首页</nz-breadcrumb-item>
+  <nz-breadcrumb-item>系统管理</nz-breadcrumb-item>
+  <nz-breadcrumb-item routerLink="/index/role">角色管理</nz-breadcrumb-item>
+</nz-breadcrumb>
+<nz-content style="background:#fff; padding: 24px; min-height: 280px;">
+  <form nz-form  id="searchRoleForm">
+    <div nz-row [nzGutter]="24">
+      <div nz-col [nzSpan]="6">
+        <nz-form-item nzFlex>
+          <nz-form-label [nzFor]="roleName">角色名称</nz-form-label>
+          <nz-form-control>  
+            <input nz-input placeholder="用户名称" id="roleName" name="roleName" [(ngModel)]="roleName">
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col [nzSpan]="6">
+        <nz-form-item nzFlex>
+          <nz-form-label [nzFor]="createTime">创建日期</nz-form-label>
+          <nz-form-control>
+              <nz-date-picker  [nzFormat]="dateFormat" placeholder="创建日期" [(ngModel)]="createTime" id="createTime" name="createTime"></nz-date-picker>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col [nzSpan]="6" style="text-align: left;">
+        <button  nz-button [nzType]="'primary'" id="btnSearch" name="btnSearch" (click)="searchData();"><i nz-icon type="search" theme="outline"></i>查询</button>
+        <button nz-button [nzType]="'primary'" id="btnAdd" name="btnAdd" (click)="showRoleAddModal();"><i nz-icon type="user-add" theme="outline"></i>添加</button>   
+      </div>
+    </div>
+  </form>
+  <nz-table
+    #ajaxTable
+    nzShowSizeChanger
+    [nzFrontPagination]="false"
+    [nzBordered]="true"
+    [nzData]="dataSet"
+    [nzLoading]="loading"
+    [nzTotal]="total"
+    [(nzPageIndex)]="pageIndex"
+    [(nzPageSize)]="pageSize"
+    (nzPageIndexChange)="searchData()"
+    (nzPageSizeChange)="searchData(true)">
+    <thead>
+      <tr>
+        <th>No.</th>
+        <th>角色名称</th>
+        <th>创建时间</th>
+        <th>修改时间</th>
+        <th>备注</th>
+        <th><span>操作</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of ajaxTable.data;let i=index">
+        <td>{{i+1}}</td>
+        <td>{{data.roleName}}</td>
+        <td>{{data.createTime}}</td>
+        <td>{{data.updateTime}}</td>
+        <td>{{data.remark}}</td>
+        <td> 
+          <button nz-button nzType="primary" (click)="showUserInfoModal(data.userId)"><i nz-icon type="edit"></i>修改</button>
+          <button nz-button nzType="danger" nz-popconfirm nzTitle="确定要删除此角色吗?" (nzOnConfirm)="deleteConfirm(data.roleId,data.roleName)" (nzOnCancel)="deleteCancel()"><i nz-icon type="user-delete" theme="outline"></i>删除</button>
+          <button nz-button nzType="dashed" id="btnRoleResource" name="btnShowResource" (click)="showRoleResourceModal(data.roleId);"><i nz-icon type="key" theme="outline"></i>授权</button>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+</nz-content>
+<!-- 添加角色 -->
+<nz-modal [(nzVisible)]="isRoleAddVisible" nzTitle="角色录入" (nzOnCancel)="handleCancel($event)" (nzOnOk)="handleOk()" [nzOkLoading]="isRoleAddOkLoading">
+  <form nz-form [formGroup]="validateAddRoleForm" id="addRoleForm">
+    <div nz-row [nzGutter]="24">
+      <div nz-col nzSpan="24">
+        <nz-form-item nzFlex>
+          <nz-form-label [nzFor]="addRoleName">角色名称</nz-form-label>
+          <!--验证的响应图标-->
+          <nz-form-control nzHasFeedback>  
+            <nz-input-group>
+              <input nz-input  id="addRoleName" name="addRoleName" formControlName="addRoleName"  placeholder="角色名称" required autocomplete="on" autofocus pattern="[\w\u4E00-\u9FA5\uF900-\uFA2D]*" minlength="2" maxlength="10">
+            </nz-input-group>
+
+            <nz-form-explain *ngIf="validateAddRoleForm.get('addRoleName').dirty && validateAddRoleForm.get('addRoleName').errors">
+              <ng-container *ngIf="validateAddRoleForm.get('addRoleName').hasError('required')">
+                请输入角色名称!
+              </ng-container>
+              <ng-container *ngIf="validateAddRoleForm.get('addRoleName').hasError('checkRoleName')">
+               角色名称已经存在!
+              </ng-container>
+              <ng-container *ngIf="validateAddRoleForm.get('addRoleName').hasError('pattern')">
+                角色名称格式错误！
+              </ng-container>
+              <ng-container *ngIf="validateAddRoleForm.get('addRoleName').hasError('minlength')">
+                最小长度为2！
+              </ng-container>
+              <ng-container *ngIf="validateAddRoleForm.get('addRoleName').hasError('maxlength')">
+                最大长度为10！
+              </ng-container>
+              <ng-container *ngIf="validateAddRoleForm.get('addRoleName').pending">
+                Validating...
+              </ng-container>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+    <div nz-row [nzGutter]="24">
+      <div nz-col nzSpan="24">
+        <nz-form-item nzFlex>
+          <nz-form-label [nzFor]="addRoleName">备&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注</nz-form-label>
+          <!--验证的响应图标-->
+          <nz-form-control nzHasFeedback>  
+            <nz-input-group>
+              <input nz-input  id="addRemark" name="addRemark" formControlName="addRemark" placeholder="备注" required autocomplete="on" pattern="[\w\u4E00-\u9FA5\uF900-\uFA2D]*" minlength="2" maxlength="20">
+            </nz-input-group>
+            <nz-form-explain *ngIf="validateAddRoleForm.get('addRemark').dirty && validateAddRoleForm.get('addRemark').errors">
+              <ng-container *ngIf="validateAddRoleForm.get('addRemark').hasError('required')">
+                请输入备注!
+              </ng-container>
+              <ng-container *ngIf="validateAddRoleForm.get('addRemark').hasError('pattern')">
+               备注格式错误！
+              </ng-container>
+              <ng-container *ngIf="validateAddRoleForm.get('addRemark').hasError('minlength')">
+                最小长度为2！
+              </ng-container>
+              <ng-container *ngIf="validateAddRoleForm.get('addRemark').hasError('maxlength')">
+                最大长度为20！
+              </ng-container>
+              <ng-container *ngIf="validateAddRoleForm.get('addRemark').pending">
+                Validating...
+              </ng-container>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+  </form>
+</nz-modal>
+<!--角色授权-->
+<nz-modal [(nzVisible)]="isRoleResourceVisible" nzTitle="角色授权" (nzOnCancel)="roleResourceCancel()" (nzOnOk)="roleResourceOk()">
+  <input type="hidden" id="roleId"[(ngModel)]="roleId">
+  <nz-tree
+    [nzData]="nodes"
+    nzCheckable="true"
+    nzMultiple="true"
+    [nzDefaultExpandAll]="true"
+    [nzCheckedKeys]="defaultCheckedKeys"
+    [nzExpandedKeys]="defaultExpandedKeys"
+    [nzSelectedKeys]="defaultSelectedKeys"
+    (nzClick)="nzEvent($event)"
+    (nzExpandChange)="nzEvent($event)"
+    (nzCheckBoxChange)="nzEvent($event)">
+  </nz-tree>
+</nz-modal>

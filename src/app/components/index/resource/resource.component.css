@@ -1,0 +1,10 @@
+[nz-form-label] {
+    overflow: visible;
+}
+[nz-button] {
+    margin-right: 8px;
+    margin-bottom: 12px;
+}
+nz-select {
+    margin-right: 8px;
+}
