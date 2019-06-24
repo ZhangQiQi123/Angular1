@@ -13,7 +13,10 @@ export class UtilService {
 
   
   //域名（项目名）
-  public api="http://127.0.0.1:8080/Springboot_Mybatis";
+  public api="http://localhost/Springboot_Mybatis";
+  if (condition) {
+    
+  }
   //请求|响应头
   public httpHeaders=new HttpHeaders({'Content-Type': 'application/x-www-form-urlencoded'});
   /**
